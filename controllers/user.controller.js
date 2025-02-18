@@ -1,5 +1,7 @@
 import { User } from "../models/user.model.js";
 import jwt from "jsonwebtoken";
+import bcrypt from "bcryptjs";
+
 
 const signup = async (req, res) =>{
     const {email, password, username} = req.body;
@@ -8,17 +10,21 @@ const signup = async (req, res) =>{
         throw new Error("All fields are required")
     }
 
+    const pass = await bcrypt.hash(password, 10)
+
+    console.log("Hashed pass is ", pass);
+    
+
+    // Check if user exits in database
     const user = await User.findOne({email})
 
     if(user){
         throw new Error("User already exists")
     }
 
-    
-
     const newUser = {
         email,
-        password,
+        password : pass,
         username
     }
 
@@ -36,6 +42,8 @@ const signin = async (req, res)=>{
         throw new Error("All fields are required")
     }
 
+    
+
     const user = await User.findOne({email})
 
     if (!user) {
@@ -43,6 +51,12 @@ const signin = async (req, res)=>{
     }
 
     // console.log("user", user);
+
+    const isPasswordCorrect =  bcrypt.compare(password, user.password)
+
+    if (!isPasswordCorrect) {
+        throw new Error("Invalid credentials!")
+    }
     
     const opt = {
         httpOnly: true,
@@ -50,17 +64,31 @@ const signin = async (req, res)=>{
     }
 
     const payload = {
+        id : user._id,
         email : user.email,
-        username : user.username
+        username : user.username,
     }
 
-    const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "1h" } )
+    const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRY} )
 
     
     res.cookie("token", token, opt)
     res.status(200).json("Login success")
-
 }
 
 
-export {signup, signin}
+const logout = async(req, res) =>{
+    const opt = {
+        httpOnly: true,
+        secure: true
+    }
+
+    res.clearCookie("token", opt)
+    res.status(200).json("Logout successfully")
+}
+
+const getuser = async(req, res) =>{
+    return res.status(200).json(req.user)
+}
+
+export {signup, signin, logout, getuser}
