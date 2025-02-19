@@ -16,7 +16,7 @@ const createTodo = async(req, res) =>{
         createdBy : user._id
     })
 
-    res.status(201).json(todo)
+    return res.status(201).json(todo)
 }
 
 const readTodo = async(req, res) =>{
