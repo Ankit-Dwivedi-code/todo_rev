@@ -19,7 +19,7 @@ export const verifyJwt = async (req, _, next)=>{
                 throw new Error("Invalid token format")
             }
 
-            const user = await User.findById(verifiedJwt?.id).select("-password -_id")
+            const user = await User.findById(verifiedJwt?.id).select("-password")
 
             if (!user) {
                 throw new Error("Invalid token format")

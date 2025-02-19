@@ -23,6 +23,8 @@ connectDb()
 })
 
 import userRouter from './routes/user.route.js'
+import todoRouter from './routes/todo.route.js'
 
 app.use(userRouter)  //http://localhost:8080/signup
+app.use(todoRouter) 
 // To run the server
