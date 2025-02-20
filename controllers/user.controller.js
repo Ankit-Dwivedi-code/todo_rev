@@ -91,4 +91,20 @@ const getuser = async(req, res) =>{
     return res.status(200).json(req.user)
 }
 
-export {signup, signin, logout, getuser}
+const updateUser = async(req, res)=>{
+    const {username} = req.body
+
+    if (!username) {
+        throw new Error("Username is required")
+    }
+
+    const user = req.user
+
+    const updatedUser = await User.findByIdAndUpdate(user._id, {
+        username
+    },{new : true})
+
+    return res.status(200).json(updatedUser)
+}
+
+export {signup, signin, logout, getuser, updateUser}
