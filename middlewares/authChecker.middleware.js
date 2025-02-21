@@ -31,6 +31,6 @@ export const verifyJwt = async (req, _, next)=>{
             next()
 
         } catch (error) {
-            throw new Error("Invalid token", error.message)
+            throw new Error(`Invalid token: ${error.message}`);
         }
 }

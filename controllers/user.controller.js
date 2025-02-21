@@ -52,7 +52,7 @@ const signin = async (req, res)=>{
 
     // console.log("user", user);
 
-    const isPasswordCorrect =  bcrypt.compare(password, user.password)
+    const isPasswordCorrect = await bcrypt.compare(password, user.password)
 
     if (!isPasswordCorrect) {
         throw new Error("Invalid credentials!")
@@ -60,7 +60,8 @@ const signin = async (req, res)=>{
     
     const opt = {
         httpOnly: true,
-        secure: true
+        secure: true,
+        sameSite: "Lax"
     }
 
     const payload = {
@@ -87,9 +88,13 @@ const logout = async(req, res) =>{
     res.status(200).json("Logout successfully")
 }
 
-const getuser = async(req, res) =>{
-    return res.status(200).json(req.user)
-}
+const getuser = (req, res) => {
+    if (!req.user) {
+        return res.status(401).json({ error: "Unauthorized" });
+    }
+
+    res.status(200).json(req.user);
+};
 
 const updateUser = async(req, res)=>{
     const {username} = req.body
@@ -103,6 +108,10 @@ const updateUser = async(req, res)=>{
     const updatedUser = await User.findByIdAndUpdate(user._id, {
         username
     },{new : true})
+
+    if (!updatedUser) {
+        return res.status(404).json({ error: "User not found" });
+    }
 
     return res.status(200).json(updatedUser)
 }
