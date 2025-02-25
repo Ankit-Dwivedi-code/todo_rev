@@ -60,8 +60,7 @@ const signin = async (req, res)=>{
     
     const opt = {
         httpOnly: true,
-        secure: true,
-        sameSite: "Lax"
+        secure: true
     }
 
     const payload = {
