@@ -12,7 +12,7 @@ const signup = async (req, res) =>{
 
     const pass = await bcrypt.hash(password, 10)
 
-    console.log("Hashed pass is ", pass);
+    // console.log("Hashed pass is ", pass); 
     
 
     // Check if user exits in database
@@ -31,7 +31,7 @@ const signup = async (req, res) =>{
     const createdUser =  await new User(newUser)
     createdUser.save()
 
-    res.status(201)
+    return res.status(201)
     .json("Signup Successfull")
 }
 
@@ -72,9 +72,9 @@ const signin = async (req, res)=>{
 
     const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRY} )
 
-    
-    res.cookie("token", token, opt)
-    res.status(200).json("Login success")
+    return res
+    .cookie("token", token, opt)
+    .status(200).json("Login success")
 }
 
 
@@ -84,8 +84,9 @@ const logout = async(req, res) =>{
         secure: true
     }
 
-    res.clearCookie("token", opt)
-    res.status(200).json("Logout successfully")
+    return res
+    .clearCookie("token", opt)
+    .status(200).json("Logout successfully")
 }
 
 const getuser = (req, res) => {
@@ -93,7 +94,7 @@ const getuser = (req, res) => {
         return res.status(401).json({ error: "Unauthorized" });
     }
 
-    res.status(200).json(req.user);
+    return res.status(200).json(req.user);
 };
 
 const updateUser = async(req, res)=>{
